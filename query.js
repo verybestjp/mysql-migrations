@@ -6,12 +6,26 @@ function run_query(conn, query, cb) {
     if (err) {
       throw err;
     }
-
-    connection.query(query, function (error, results, fields) {
+    if (!Array.isArray(query)) {
+      query = [query];
+    }
+    if (0 === query.length || !query[0]) {
       connection.release();
+      return cb();
+    }
+    var query_it = query.shift();
+    if (process.env.VERBOSE) {
+      console.log(query_it);
+    }
+    connection.query(query_it, function (error, results, fields) {
       if (error) {
         throw error;
       }
+      if (query.length > 0) {
+        run_query(conn, query, cb);
+        return;
+      }
+      connection.release();
       cb(results);
     });
   });
@@ -24,7 +38,13 @@ function execute_query(conn, path, final_file_paths, type, cb) {
 
     var queries = require(current_file_path);
     var timestamp_val = file_name.split("_", 1)[0];
-    if (typeof(queries[type]) == 'string') {
+    if (Array.isArray(queries[type])) {
+      run_query(conn, queries[type].slice(0), function (res) {
+        updateRecords(conn, type, table, timestamp_val, function () {
+          execute_query(conn, path, final_file_paths, type, cb);
+        });
+      });
+    } else if (typeof(queries[type]) == 'string') {
       run_query(conn, queries[type], function (res) {
         updateRecords(conn, type, table, timestamp_val, function () {
           execute_query(conn, path, final_file_paths, type, cb);
@@ -35,6 +55,10 @@ function execute_query(conn, path, final_file_paths, type, cb) {
         updateRecords(conn, type, table, timestamp_val, function () {
           execute_query(conn, path, final_file_paths, type, cb);
         });
+      });
+    } else {
+      updateRecords(conn, type, table, timestamp_val, function () {
+        execute_query(conn, path, final_file_paths, type, cb);
       });
     }
 
