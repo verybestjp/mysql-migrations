@@ -69,15 +69,29 @@ function execute_query(conn, path, final_file_paths, type, cb) {
 
 function updateRecords(conn, type, table, timestamp_val, cb) {
   var query = '';
+  var query2 = '';
   if (type == 'up') {
     query = "INSERT INTO " + table + " (`timestamp`) VALUES ('" + timestamp_val + "')";
+
+    run_query(conn, query, function (res) {
+      cb();
+    });
   } else if (type == 'down') {
     query = "DELETE FROM " + table + " WHERE `timestamp` = '" + timestamp_val + "'"
-  }
 
-  run_query(conn, query, function (res) {
-    cb();
-  });
+    run_query(conn, query, function (res) {
+      cb();
+    });
+  } else if (type == 'set') {
+    query = "DELETE FROM " + table;
+    query2 = "INSERT INTO " + table + " (`timestamp`) VALUES ('" + timestamp_val + "')";
+
+    run_query(conn, query, function (res) {
+      run_query(conn, query2, function (res) {
+        cb();
+      });
+    });
+  }
 }
 
 module.exports = {

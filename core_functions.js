@@ -82,6 +82,11 @@ function down_migrations(conn, max_count, path, cb) {
   });
 }
 
+function set_migrations(conn, timestamp_val, path, cb) {
+  queryFunctions.updateRecords(conn, 'set', table, timestamp_val, cb);
+}
+
+
 function run_migration_directly(file, type, conn, path, cb) {
   var current_file_path = path + "/" + file;
   var query = require(current_file_path)[type];
@@ -92,5 +97,6 @@ module.exports = {
   add_migration: add_migration,
   up_migrations: up_migrations,
   down_migrations: down_migrations,
+  set_migrations: set_migrations,
   run_migration_directly: run_migration_directly
 };

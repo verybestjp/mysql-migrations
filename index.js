@@ -55,6 +55,15 @@ function handle(argv, conn, path, cb) {
         conn.end();
         cb();
       });
+    } else if (argv[2] == 'set') {
+      var timestamp_val = argv[3] || 0;
+      if (10 === String(timestamp_val).length) {
+        timestamp_val += '000';
+      }
+      coreFunctions.set_migrations(conn, timestamp_val, path, function () {
+        conn.end();
+        cb();
+      });
     } else {
       throw new Error('command not found : ' + argv.join(" "));
     }
