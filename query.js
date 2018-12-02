@@ -2,32 +2,25 @@ var table = require('./config')['table'];
 var fileFunctions  = require('./file');
 
 function run_query(conn, query, cb) {
-  conn.getConnection(function(err, connection) {
-    if (err) {
-      throw err;
+  if (!Array.isArray(query)) {
+    query = [query];
+  }
+  if (0 === query.length || !query[0]) {
+    return cb();
+  }
+  var query_it = query.shift();
+  if (process.env.VERBOSE) {
+    console.log(query_it);
+  }
+  conn.query(query_it, function (error, results, fields) {
+    if (error) {
+      throw error;
     }
-    if (!Array.isArray(query)) {
-      query = [query];
+    if (query.length > 0) {
+      run_query(conn, query, cb);
+      return;
     }
-    if (0 === query.length || !query[0]) {
-      connection.release();
-      return cb();
-    }
-    var query_it = query.shift();
-    if (process.env.VERBOSE) {
-      console.log(query_it);
-    }
-    connection.query(query_it, function (error, results, fields) {
-      if (error) {
-        throw error;
-      }
-      if (query.length > 0) {
-        run_query(conn, query, cb);
-        return;
-      }
-      connection.release();
-      cb(results);
-    });
+    cb(results);
   });
 }
 

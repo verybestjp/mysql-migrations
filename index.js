@@ -20,7 +20,6 @@ function handle(argv, conn, path, cb) {
   if (argv.length > 2 && argv.length <= 6) {
     if (argv[2] == 'add' && (argv[3] == 'migration' || argv[3] == 'seed')) {
       coreFunctions.add_migration(argv, path, function () {
-        conn.end();
         cb();
       });
     } else if (argv[2] == 'up') {
@@ -31,7 +30,6 @@ function handle(argv, conn, path, cb) {
         count = 999999;
       }
       coreFunctions.up_migrations(conn, count, path, function () {
-        conn.end();
         cb();
       });
     } else if (argv[2] == 'down') {
@@ -40,19 +38,16 @@ function handle(argv, conn, path, cb) {
         count = parseInt(argv[3]);
       } else count = 1;
       coreFunctions.down_migrations(conn, count, path, function () {
-        conn.end();
         cb();
       });
     } else if (argv[2] == 'refresh') {
       coreFunctions.down_migrations(conn, 999999, path, function () {
         coreFunctions.up_migrations(conn, 999999, path, function () {
-          conn.end();
           cb();
         });
       });
     } else if (argv[2] == 'run' && migrations_types.indexOf(argv[4]) > -1) {
       coreFunctions.run_migration_directly(argv[3], argv[4], conn, path, function () {
-        conn.end();
         cb();
       });
     } else if (argv[2] == 'set') {
@@ -61,7 +56,6 @@ function handle(argv, conn, path, cb) {
         timestamp_val += '000';
       }
       coreFunctions.set_migrations(conn, timestamp_val, path, function () {
-        conn.end();
         cb();
       });
     } else {
