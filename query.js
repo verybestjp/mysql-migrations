@@ -77,9 +77,15 @@ function updateRecords(conn, type, table, timestamp_val, cb) {
     });
   } else if (type == 'set') {
     query = "DELETE FROM " + table;
-    query2 = "INSERT INTO " + table + " (`timestamp`) VALUES ('" + timestamp_val + "')";
-
     run_query(conn, query, function (res) {
+      if (!Array.isArray(timestamp_val)) {
+        return cb();
+      }
+      timestamp_val = timestamp_val.map((it) => {
+        return '("' + it + '")';
+      });
+      query2 = "INSERT INTO " + table + " VALUES " + timestamp_val.join(',');
+
       run_query(conn, query2, function (res) {
         cb();
       });

@@ -83,7 +83,15 @@ function down_migrations(conn, max_count, path, cb) {
 }
 
 function set_migrations(conn, timestamp_val, path, cb) {
-  queryFunctions.updateRecords(conn, 'set', table, timestamp_val, cb);
+
+  var timestamps = [];
+  fileFunctions.readFolder(path, function (files) {
+    files.forEach(function (file) {
+      var timestamp = file.split("_", 1)[0];
+      timestamps.push(timestamp);
+    });
+    queryFunctions.updateRecords(conn, 'set', table, timestamps, cb);
+  });
 }
 
 
