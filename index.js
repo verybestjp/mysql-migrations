@@ -61,6 +61,8 @@ function handle(argv, container, path, cb) {
     } else {
       throw new Error('command not found : ' + argv.join(" "));
     }
+  } else {
+    throw new Error('command not found : ' + argv.join(" "));
   }
 }
 
