@@ -30,8 +30,11 @@ function execute_query(container, path, final_file_paths, type, cb) {
     var file_name = final_file_paths.shift()['file_path'];
     var current_file_path = path + "/" + file_name;
 
-    var queries = require(current_file_path);
+    var queries = Object.assign({}, require(current_file_path));
     var timestamp_val = file_name.split("_", 1)[0];
+    if (typeof(queries[type]) == 'function') {
+      queries[type] = queries[type](container);
+    }
     if (Array.isArray(queries[type])) {
       run_query(container, queries[type].slice(0), function (res) {
         updateRecords(container, type, table, timestamp_val, function () {
@@ -40,12 +43,6 @@ function execute_query(container, path, final_file_paths, type, cb) {
       });
     } else if (typeof(queries[type]) == 'string') {
       run_query(container, queries[type], function (res) {
-        updateRecords(container, type, table, timestamp_val, function () {
-          execute_query(container, path, final_file_paths, type, cb);
-        });
-      });
-    } else if (typeof(queries[type]) == 'function') {
-      queries[type](container, function() {
         updateRecords(container, type, table, timestamp_val, function () {
           execute_query(container, path, final_file_paths, type, cb);
         });
