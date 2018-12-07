@@ -7,16 +7,16 @@ var config = require('./config');
 var table = config['table'];
 var migrations_types = config['migrations_types'];
 
-function migration(conn, path, cb) {
+function migration(container, path, cb) {
   if(cb == null)
     cb = () => {};
 
-  queryFunctions.run_query(conn, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE)", function (res) {
-    handle(process.argv, conn, path, cb);
+  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE)", function (res) {
+    handle(process.argv, container, path, cb);
   });
 }
 
-function handle(argv, conn, path, cb) {
+function handle(argv, container, path, cb) {
   if (argv.length > 2 && argv.length <= 6) {
     if (argv[2] == 'add' && (argv[3] == 'migration' || argv[3] == 'seed')) {
       coreFunctions.add_migration(argv, path, function () {
@@ -29,7 +29,7 @@ function handle(argv, conn, path, cb) {
       } else {
         count = 999999;
       }
-      coreFunctions.up_migrations(conn, count, path, function () {
+      coreFunctions.up_migrations(container, count, path, function () {
         cb();
       });
     } else if (argv[2] == 'down') {
@@ -37,17 +37,17 @@ function handle(argv, conn, path, cb) {
       if (argv.length > 3) {
         count = parseInt(argv[3]);
       } else count = 1;
-      coreFunctions.down_migrations(conn, count, path, function () {
+      coreFunctions.down_migrations(container, count, path, function () {
         cb();
       });
     } else if (argv[2] == 'refresh') {
-      coreFunctions.down_migrations(conn, 999999, path, function () {
-        coreFunctions.up_migrations(conn, 999999, path, function () {
+      coreFunctions.down_migrations(container, 999999, path, function () {
+        coreFunctions.up_migrations(container, 999999, path, function () {
           cb();
         });
       });
     } else if (argv[2] == 'run' && migrations_types.indexOf(argv[4]) > -1) {
-      coreFunctions.run_migration_directly(argv[3], argv[4], conn, path, function () {
+      coreFunctions.run_migration_directly(argv[3], argv[4], container, path, function () {
         cb();
       });
     } else if (argv[2] == 'set') {
@@ -55,7 +55,7 @@ function handle(argv, conn, path, cb) {
       if (10 === String(timestamp_val).length) {
         timestamp_val += '000';
       }
-      coreFunctions.set_migrations(conn, timestamp_val, path, function () {
+      coreFunctions.set_migrations(container, timestamp_val, path, function () {
         cb();
       });
     } else {

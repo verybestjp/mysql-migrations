@@ -31,8 +31,8 @@ function add_migration(argv, path, cb) {
   });
 }
 
-function up_migrations(conn, max_count, path, cb) {
-  queryFunctions.run_query(conn, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT 1", function (results) {
+function up_migrations(container, max_count, path, cb) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT 1", function (results) {
     var file_paths = [];
     var max_timestamp = 0;
     if (results.length) {
@@ -53,13 +53,13 @@ function up_migrations(conn, max_count, path, cb) {
       });
 
       var final_file_paths = file_paths.sort(function(a, b) { return (a.timestamp - b.timestamp)}).slice(0, max_count);
-      queryFunctions.execute_query(conn, path, final_file_paths, 'up', cb);
+      queryFunctions.execute_query(container, path, final_file_paths, 'up', cb);
     });
   });
 }
 
-function down_migrations(conn, max_count, path, cb) {
-  queryFunctions.run_query(conn, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
+function down_migrations(container, max_count, path, cb) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
     var file_paths = [];
     var max_timestamp = 0;
     if (results.length) {
@@ -76,13 +76,13 @@ function down_migrations(conn, max_count, path, cb) {
         });
 
         var final_file_paths = file_paths.sort(function(a, b) { return (b.timestamp - a.timestamp)}).slice(0, max_count);
-        queryFunctions.execute_query(conn, path, final_file_paths, 'down', cb);
+        queryFunctions.execute_query(container, path, final_file_paths, 'down', cb);
       });
     }
   });
 }
 
-function set_migrations(conn, timestamp_val, path, cb) {
+function set_migrations(container, timestamp_val, path, cb) {
 
   var timestamps = [];
   fileFunctions.readFolder(path, function (files) {
@@ -90,15 +90,15 @@ function set_migrations(conn, timestamp_val, path, cb) {
       var timestamp = file.split("_", 1)[0];
       timestamps.push(timestamp);
     });
-    queryFunctions.updateRecords(conn, 'set', table, timestamps, cb);
+    queryFunctions.updateRecords(container, 'set', table, timestamps, cb);
   });
 }
 
 
-function run_migration_directly(file, type, conn, path, cb) {
+function run_migration_directly(file, type, container, path, cb) {
   var current_file_path = path + "/" + file;
   var query = require(current_file_path)[type];
-  queryFunctions.run_query(conn, query, cb);
+  queryFunctions.run_query(container, query, cb);
 }
 
 module.exports = {
