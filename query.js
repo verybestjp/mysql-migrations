@@ -79,6 +79,9 @@ function updateRecords(container, type, table, timestamp_val, cb) {
       if (!Array.isArray(timestamp_val)) {
         return cb();
       }
+      timestamp_val = timestamp_val.filter(function (x, i, a) { // array unique
+        return a.indexOf(x) == i;
+      });
       timestamp_val = timestamp_val.map((it) => {
         return '("' + it + '")';
       });
