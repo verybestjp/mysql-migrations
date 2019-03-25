@@ -25,18 +25,6 @@ function run_query(container, query, cb) {
   });
 }
 
-const run_promised_query = async (container, query) => {
-  var conn = container.conn;
-  return new Promise(async (resolve, reject) => {
-    await conn.query(query, function (error, results, fields) {
-      if (error) {
-        reject(error);
-      }
-      resolve(results);
-    });
-  })
-};
-
 function execute_query(container, path, final_file_paths, type, cb) {
   if (final_file_paths.length) {
     var file_name = final_file_paths.shift()['file_path'];
@@ -108,7 +96,6 @@ function updateRecords(container, type, table, timestamp_val, cb) {
 
 module.exports = {
   run_query: run_query,
-  run_promised_query: run_promised_query,
   execute_query: execute_query,
   updateRecords: updateRecords
 };
