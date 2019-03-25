@@ -34,8 +34,7 @@ function add_migration(argv, path, cb) {
 function up_migrations(container, max_count, path, cb) {
   queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp ASC", function (results) {
     var file_paths = [];
-    console.log(222, results[0].timestamp, results[1].timestamp);
-    fileFunctions.readFolder(path, async (files) => {
+    fileFunctions.readFolder(path, (files) => {
       for (file of files) {
         var timestamp_split = file.split("_", 1);
         if (timestamp_split.length) {
