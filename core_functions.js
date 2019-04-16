@@ -97,7 +97,7 @@ function set_migrations(container, timestamp_val, path, cb) {
 
 function run_migration_directly(file, type, container, path, cb) {
   var current_file_path = path + "/" + file;
-  var query = require(current_file_path)[type];
+  var query = require(current_file_path)[type](container);
   queryFunctions.run_query(container, query, cb);
 }
 
