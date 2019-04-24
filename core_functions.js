@@ -84,7 +84,6 @@ function down_migrations(container, max_count, path, cb) {
 
 function down_skip_migrations(container, max_count, path, cb) {
   queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
-    var file_paths = [];
     var max_timestamp = 0;
     if (results.length) {
       var temp_timestamps = results.map(function(ele) {
@@ -101,6 +100,8 @@ function down_skip_migrations(container, max_count, path, cb) {
       queryFunctions.run_query(container, query, function (res) {
         cb();
       });
+    } else {
+      cb();
     }
   });
 }
