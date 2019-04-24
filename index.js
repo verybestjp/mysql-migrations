@@ -40,6 +40,14 @@ function handle(argv, container, path, cb) {
       coreFunctions.down_migrations(container, count, path, function () {
         cb();
       });
+    } else if (argv[2] == 'down-skip') {
+      var count = null;
+      if (argv.length > 3) {
+        count = parseInt(argv[3]);
+      } else count = 1;
+      coreFunctions.down_skip_migrations(container, count, path, function () {
+        cb();
+      });
     } else if (argv[2] == 'refresh') {
       coreFunctions.down_migrations(container, 999999, path, function () {
         coreFunctions.up_migrations(container, 999999, path, function () {

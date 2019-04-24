@@ -82,6 +82,29 @@ function down_migrations(container, max_count, path, cb) {
   });
 }
 
+function down_skip_migrations(container, max_count, path, cb) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
+    var file_paths = [];
+    var max_timestamp = 0;
+    if (results.length) {
+      var temp_timestamps = results.map(function(ele) {
+        return ele.timestamp;
+      });
+      let strTimestamps = '';
+      temp_timestamps.forEach(function (temp_timestamp) {
+        if(strTimestamps.length > 0) {
+          strTimestamps += ",";
+        }
+        strTimestamps += "'" + temp_timestamp + "'";
+      });
+      let query = "DELETE FROM " + table + " WHERE `timestamp` IN (" + strTimestamps + ")";
+      queryFunctions.run_query(container, query, function (res) {
+        cb();
+      });
+    }
+  });
+}
+
 function set_migrations(container, timestamp_val, path, cb) {
 
   var timestamps = [];
@@ -105,6 +128,7 @@ module.exports = {
   add_migration: add_migration,
   up_migrations: up_migrations,
   down_migrations: down_migrations,
+  down_skip_migrations: down_skip_migrations,
   set_migrations: set_migrations,
   run_migration_directly: run_migration_directly
 };
