@@ -89,17 +89,7 @@ function down_skip_migrations(container, max_count, path, cb) {
       var temp_timestamps = results.map(function(ele) {
         return ele.timestamp;
       });
-      let strTimestamps = '';
-      temp_timestamps.forEach(function (temp_timestamp) {
-        if(strTimestamps.length > 0) {
-          strTimestamps += ",";
-        }
-        strTimestamps += "'" + temp_timestamp + "'";
-      });
-      let query = "DELETE FROM " + table + " WHERE `timestamp` IN (" + strTimestamps + ")";
-      queryFunctions.run_query(container, query, function (res) {
-        cb();
-      });
+      queryFunctions.updateRecords(container, "down", table, temp_timestamps, cb);
     } else {
       cb();
     }

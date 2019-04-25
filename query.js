@@ -68,7 +68,16 @@ function updateRecords(container, type, table, timestamp_val, cb) {
       cb();
     });
   } else if (type == 'down') {
-    query = "DELETE FROM " + table + " WHERE `timestamp` = '" + timestamp_val + "'"
+    let timestampList;
+    if (!Array.isArray(timestamp_val)){
+      timestampList = [timestamp_val];
+    } else {
+      timestampList = timestamp_val;
+    }
+    timestampList = timestampList.map((it) => {
+      return '"' + it + '"';
+    });
+    query = "DELETE FROM " + table + " WHERE `timestamp` in (" + timestampList.join(',') + ")";
 
     run_query(container, query, function (res) {
       cb();
