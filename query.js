@@ -12,10 +12,17 @@ function run_query(container, query, cb) {
   if (process.env.VERBOSE) {
     console.log(query_it);
   }
+  let ignore_error = false;
+  if ('@' === query_it[0]) {
+    ignore_error = true;
+    query_it = query_it.substr(1);
+  }
   var conn = container.conn;
   conn.query(query_it, function (error, results, fields) {
     if (error) {
-      throw error;
+      if (!ignore_error) {
+        throw error;
+      }
     }
     if (query.length > 0) {
       run_query(container, query, cb);
