@@ -39,27 +39,33 @@ function execute_query(container, path, final_file_paths, type, cb) {
 
     var queries = Object.assign({}, require(current_file_path));
     var timestamp_val = file_name.split("_", 1)[0];
-    if (typeof(queries[type]) == 'function') {
-      queries[type] = queries[type](container);
-    }
-    if (Array.isArray(queries[type])) {
-      run_query(container, queries[type].slice(0), function (res) {
-        updateRecords(container, type, table, timestamp_val, function () {
-          execute_query(container, path, final_file_paths, type, cb);
-        });
-      });
-    } else if (typeof(queries[type]) == 'string') {
-      run_query(container, queries[type], function (res) {
-        updateRecords(container, type, table, timestamp_val, function () {
-          execute_query(container, path, final_file_paths, type, cb);
-        });
-      });
-    } else {
-      updateRecords(container, type, table, timestamp_val, function () {
-        execute_query(container, path, final_file_paths, type, cb);
-      });
-    }
 
+    Promise.resolve().then(() => {
+      if (typeof(queries[type]) === 'function') {
+        return queries[type](container);
+      }
+      return queries[type];
+    }).then((result) => {
+      queries[type] = result;
+
+      if (Array.isArray(queries[type])) {
+        run_query(container, queries[type].slice(0), function (res) {
+          updateRecords(container, type, table, timestamp_val, function () {
+            execute_query(container, path, final_file_paths, type, cb);
+          });
+        });
+      } else if (typeof(queries[type]) == 'string') {
+        run_query(container, queries[type], function (res) {
+          updateRecords(container, type, table, timestamp_val, function () {
+            execute_query(container, path, final_file_paths, type, cb);
+          });
+        });
+      } else {
+        updateRecords(container, type, table, timestamp_val, function () {
+          execute_query(container, path, final_file_paths, type, cb);
+        });
+      }
+    });
   } else {
     cb();
   }
