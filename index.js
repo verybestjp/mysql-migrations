@@ -16,6 +16,18 @@ function migration(container, path, cb) {
   });
 }
 
+function execute(argv, container, path, cb) {
+  if(cb == null)
+    cb = () => {};
+
+  argv = argv.slice(0);
+  argv.unshift('', ''); // 先頭に2つ要素を追加
+
+  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE)", function (res) {
+    handle(argv, container, path, cb);
+  });
+}
+
 function handle(argv, container, path, cb) {
   if (argv.length > 2 && argv.length <= 6) {
     if (argv[2] == 'add' && (argv[3] == 'migration' || argv[3] == 'seed')) {
@@ -75,5 +87,6 @@ function handle(argv, container, path, cb) {
 }
 
 module.exports = {
-  init: migration
+  init: migration,
+  execute
 }
