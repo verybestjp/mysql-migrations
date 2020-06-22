@@ -42,13 +42,12 @@ function up_migrations(container, max_count, path, cb) {
     fileFunctions.readFolder(path, function (files) {
       files.forEach(function (file) {
         var timestamp_split = file.split("_", 1);
-        if (timestamp_split.length) {
-          var timestamp = parseInt(timestamp_split[0]);
-          if (Number.isInteger(timestamp) && timestamp.toString().length == 13 && timestamp > max_timestamp) {
-            file_paths.push({ timestamp : timestamp, file_path : file});
-          }
-        } else {
+        if (0 === timestamp_split.length) {
           throw new Error('Invalid file ' + file);
+        }
+        var timestamp = parseInt(timestamp_split[0]);
+        if (Number.isInteger(timestamp) && timestamp.toString().length == 13 && timestamp > max_timestamp) {
+          file_paths.push({ timestamp : timestamp, file_path : file});
         }
       });
 
@@ -111,8 +110,17 @@ function set_migrations(container, timestamp_val, path, cb) {
 
 function run_migration_directly(file, type, container, path, cb) {
   var current_file_path = path + "/" + file;
-  var query = require(current_file_path)[type](container);
-  queryFunctions.run_query(container, query, cb);
+  var timestamp_split = file.split("_", 1);
+  if (0 === timestamp_split.length) {
+    throw new Error('Invalid file ' + file);
+  }
+  var file_paths = [];
+  var timestamp = parseInt(timestamp_split[0]);
+  if (Number.isInteger(timestamp) && timestamp.toString().length == 13) {
+    file_paths.push({ timestamp : timestamp, file_path : file});
+  }
+
+  queryFunctions.execute_query(container, path, file_paths, type, cb);
 }
 
 module.exports = {
