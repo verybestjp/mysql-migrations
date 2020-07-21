@@ -40,6 +40,10 @@ function execute_query(container, path, final_file_paths, type, cb) {
     var queries = Object.assign({}, require(current_file_path));
     var timestamp_val = file_name.split("_", 1)[0];
 
+    if (process.env.VERBOSE) {
+      console.log(`### execute file: run ${file_name} ${type}`);
+    }
+
     Promise.resolve().then(() => {
       if (typeof(queries[type]) === 'function') {
         return queries[type](container);
