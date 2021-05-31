@@ -8,7 +8,7 @@ function run_query(container, query, cb) {
   if (0 === query.length || !query[0]) {
     return cb();
   }
-  var query_it = query.shift();
+  var query_it = String(query.shift()).trim();
   if (process.env.VERBOSE) {
     console.log(query_it);
   }
