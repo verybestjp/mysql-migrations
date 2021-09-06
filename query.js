@@ -69,6 +69,8 @@ function execute_query(container, path, final_file_paths, type, cb) {
           execute_query(container, path, final_file_paths, type, cb);
         });
       }
+    }).catch(err => {
+      cb(err);
     });
   } else {
     cb();
