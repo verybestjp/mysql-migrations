@@ -36,10 +36,18 @@ function up_migrations(container, max_count, path, cb) {
     var file_paths = [];
     fileFunctions.readFolder(path, (files) => {
       for (file of files) {
-        var timestamp_split = file.split("_", 1);
-        if (timestamp_split.length) {
+        if (String(file).startsWith('.')) {
+          // . で始まるものは飛ばす
+          continue;
+        }
+        var timestamp_split = file.split('_', 1);
+        if (timestamp_split.length > 0) {
           var timestamp = Number(timestamp_split[0]);
-          if (!(Number.isInteger(timestamp) && timestamp.toString().length == 13)) {
+          if (!timestamp) {
+            // 数字以外のものは飛ばす
+            continue;
+          }
+          if (!timestamp.toString().length == 13) {
             throw new Error('Invalid file ' + file);
           }
           const ret = results.find(obj => Number(obj.timestamp) === timestamp);
