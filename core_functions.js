@@ -47,7 +47,7 @@ function up_migrations(container, max_count, path, cb) {
             // 数字以外のものは飛ばす
             continue;
           }
-          if (!timestamp.toString().length == 13) {
+          if (timestamp.toString().length !== 13) {
             throw new Error('Invalid file ' + file);
           }
           const ret = results.find(obj => Number(obj.timestamp) === timestamp);
