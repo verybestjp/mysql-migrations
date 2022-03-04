@@ -47,7 +47,7 @@ function up_migrations(container, max_count, path, cb) {
             // 数字以外のものは飛ばす
             continue;
           }
-          if (timestamp.toString().length !== 13) {
+          if (timestamp.toString().length !== 13 && timestamp.toString().length !== 14) {
             throw new Error('Invalid file ' + file);
           }
           const ret = results.find(obj => Number(obj.timestamp) === timestamp);
@@ -125,9 +125,13 @@ function run_migration_directly(file, type, container, path, cb) {
   }
   var file_paths = [];
   var timestamp = parseInt(timestamp_split[0]);
-  if (Number.isInteger(timestamp) && timestamp.toString().length == 13) {
-    file_paths.push({ timestamp : timestamp, file_path : file});
+  if (!Number.isInteger(timestamp)) {
+    return;
   }
+  if (timestamp.toString().length !== 13 && timestamp.toString().length !== 14) {
+    return;
+  }
+  file_paths.push({ timestamp : timestamp, file_path : file});
 
   queryFunctions.execute_query(container, path, file_paths, type, cb);
 }
