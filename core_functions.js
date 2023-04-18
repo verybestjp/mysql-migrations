@@ -131,9 +131,14 @@ function run_migration_directly(file, type, container, path, cb) {
   if (timestamp.toString().length !== 13 && timestamp.toString().length !== 14) {
     return;
   }
-  file_paths.push({ timestamp : timestamp, file_path : file});
-
-  queryFunctions.execute_query(container, path, file_paths, type, cb);
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " WHERE timestamp = " + timestamp + " ORDER BY timestamp ASC", function (results) {
+    if ( (type === 'up' && !results.length) || (type === 'down' && results.length) ) {
+      file_paths.push({ timestamp : timestamp, file_path : file});
+      queryFunctions.execute_query(container, path, file_paths, type, cb);
+    } else {
+      cb();
+    }
+  });
 }
 
 module.exports = {
