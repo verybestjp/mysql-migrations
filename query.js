@@ -45,21 +45,30 @@ function execute_query(container, path, final_file_paths, type, cb) {
     }
 
     Promise.resolve().then(() => {
-      if (typeof(queries[type]) === 'function') {
-        return queries[type](container);
+      const real_type = type.replace('_force', '');
+      if (typeof(queries[real_type]) === 'function') {
+        return queries[real_type](container);
       }
-      return queries[type];
+      return queries[real_type];
     }).then((result) => {
       queries[type] = result;
 
       if (Array.isArray(queries[type])) {
-        run_query(container, queries[type].slice(0), function (res) {
+        let query = queries[type].slice(0);
+        if (['up_force', 'down_force'].includes(type)) {
+          query = query.map(it => it[0] !== '@' ? '@' + it : it );
+        }
+        run_query(container, query, function (res) {
           updateRecords(container, type, table, timestamp_val, function () {
             execute_query(container, path, final_file_paths, type, cb);
           });
         });
       } else if (typeof(queries[type]) == 'string') {
-        run_query(container, queries[type], function (res) {
+        let query = queries[type];
+        if (['up_force', 'down_force'].includes(type)) {
+          query = query[0] !== '@' ? '@' + query : query;
+        }
+        run_query(container, query, function (res) {
           updateRecords(container, type, table, timestamp_val, function () {
             execute_query(container, path, final_file_paths, type, cb);
           });
@@ -80,13 +89,15 @@ function execute_query(container, path, final_file_paths, type, cb) {
 function updateRecords(container, type, table, timestamp_val, cb) {
   var query = '';
   var query2 = '';
-  if (type == 'up') {
+  if (['up', 'up_force'].includes(type)) {
     query = "INSERT INTO " + table + " (`timestamp`) VALUES ('" + timestamp_val + "')";
-
+    if ('up_force') {
+      query = '@' + query;
+    }
     run_query(container, query, function (res) {
       cb();
     });
-  } else if (type == 'down') {
+  } else if (['down', 'down_force'].includes(type)) {
     let timestampList;
     if (!Array.isArray(timestamp_val)){
       timestampList = [timestamp_val];
@@ -97,6 +108,9 @@ function updateRecords(container, type, table, timestamp_val, cb) {
       return '"' + it + '"';
     });
     query = "DELETE FROM " + table + " WHERE `timestamp` in (" + timestampList.join(',') + ")";
+    if ('down_force') {
+      query = '@' + query;
+    }
 
     run_query(container, query, function (res) {
       cb();
