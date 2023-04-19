@@ -131,6 +131,11 @@ function run_migration_directly(file, type, container, path, cb) {
   if (timestamp.toString().length !== 13 && timestamp.toString().length !== 14) {
     return;
   }
+  if (['up_force', 'down_force'].includes(type)) {
+    file_paths.push({ timestamp : timestamp, file_path : file});
+    queryFunctions.execute_query(container, path, file_paths, type, cb);
+    return;
+  }
   queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " WHERE timestamp = " + timestamp + " ORDER BY timestamp ASC", function (results) {
     if ( (type === 'up' && !results.length) || (type === 'down' && results.length) ) {
       file_paths.push({ timestamp : timestamp, file_path : file});
