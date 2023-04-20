@@ -11,7 +11,7 @@ function migration(container, path, cb) {
   if(cb == null)
     cb = () => {};
 
-  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE)", function (res) {
+  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE, `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP)", function (res) {
     handle(process.argv, container, path, cb);
   });
 }
@@ -23,7 +23,7 @@ function execute(argv, container, path, cb) {
   argv = argv.slice(0);
   argv.unshift('', ''); // 先頭に2つ要素を追加
 
-  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE)", function (res) {
+  queryFunctions.run_query(container, "CREATE TABLE IF NOT EXISTS `" + table + "` (`timestamp` varchar(254) NOT NULL UNIQUE, `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP)", function (res) {
     handle(argv, container, path, cb);
   });
 }
