@@ -127,7 +127,7 @@ function updateRecords(container, type, table, timestamp_val, cb) {
       timestamp_val = timestamp_val.map((it) => {
         return '("' + it + '")';
       });
-      query2 = "INSERT INTO " + table + " VALUES " + timestamp_val.join(',');
+      query2 = "INSERT INTO " + table + " (`timestamp`) VALUES " + timestamp_val.join(',');
 
       run_query(container, query2, function (res) {
         cb();
