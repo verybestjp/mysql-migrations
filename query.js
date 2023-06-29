@@ -133,6 +133,8 @@ function updateRecords(container, type, table, timestamp_val, cb) {
         cb();
       });
     });
+  } else if (type === 'prepareTest') {
+    cb();
   }
 }
 
