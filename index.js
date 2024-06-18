@@ -1,5 +1,3 @@
-var fs = require("fs");
-
 var coreFunctions  = require('./core_functions');
 var queryFunctions  = require('./query');
 
