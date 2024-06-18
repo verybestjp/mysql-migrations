@@ -1,5 +1,4 @@
 var table = require('./config')['table'];
-var fileFunctions  = require('./file');
 
 function run_query(container, query, cb) {
   if (!Array.isArray(query)) {

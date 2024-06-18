@@ -3,9 +3,7 @@
   "version": "1.0.6",
   "description": "A tool to use with mysql package to maintain migrations",
   "main": "index.js",
-  "scripts": {
-    "test": "node node_modules/.bin/mocha test/*"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawadhiya21/mysql-migrations.git"
@@ -24,9 +22,5 @@
   },
   "homepage": "https://github.com/kawadhiya21/mysql-migrations#readme",
   "dependencies": {},
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "mysql": "^2.13.0"
-  }
+  "devDependencies": {}
 }

@@ -8,7 +8,7 @@
  - [Executing Migrations](#executing-migrations)
 
 ## Prerequisites
-A node project with [mysql](https://github.com/mysqljs/mysql) used for database.
+A node project with [mysql2](https://github.com/sidorares/node-mysql2) used for database.
 
 ## Install
 It can be installed using npm.
@@ -23,7 +23,7 @@ npm install mysql-migrations
 
 ```
 # migration.js
-var mysql = require('mysql');
+var mysql = require('mysql2');
 var migration = require('mysql-migration');
 
 var connection = mysql.createPool({
