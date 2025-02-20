@@ -32,7 +32,10 @@ function add_migration(argv, path, cb) {
 }
 
 function up_migrations(container, max_count, path, cb) {
-  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp ASC", function (results) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp ASC", function (error, results) {
+    if (error) {
+      return cb(error);
+    }
     var file_paths = [];
     fileFunctions.readFolder(path, (files) => {
       for (file of files) {
@@ -67,7 +70,10 @@ function up_migrations(container, max_count, path, cb) {
 }
 
 function down_migrations(container, max_count, path, cb) {
-  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (error, results) {
+    if (error) {
+      return cb(error);
+    }
     var file_paths = [];
     var max_timestamp = 0;
     if (results.length) {
@@ -91,7 +97,10 @@ function down_migrations(container, max_count, path, cb) {
 }
 
 function down_skip_migrations(container, max_count, path, cb) {
-  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (results) {
+  queryFunctions.run_query(container, "SELECT timestamp FROM " + table + " ORDER BY timestamp DESC LIMIT " + max_count, function (error, results) {
+    if (error) {
+      return cb(error);
+    }
     var max_timestamp = 0;
     if (results.length) {
       var temp_timestamps = results.map(function(ele) {
